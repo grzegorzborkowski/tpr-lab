@@ -28,8 +28,8 @@ int main(int argc, char**argv) {
         for(int i=0; i<number_of_buckets; i++) {
                 omp_init_lock(&write_locks[i]);
         }
-        
-        #pragma omp parallel 
+
+        #pragma omp parallel  num_threads(number_of_threads)
         {
                 srand(int(time(NULL)) ^ omp_get_thread_num()); // https://www.viva64.com/en/b/0012/
                 #pragma omp for
@@ -45,7 +45,7 @@ int main(int argc, char**argv) {
                 }
         }
 
-        #pragma omp parallel for
+        #pragma omp parallel for num_threads(number_of_threads)
         for(int n=0; n<number_of_points; ++n) {
                 int divide = range_of_numbers / number_of_buckets;
                 if (divide == 0) {
@@ -71,8 +71,9 @@ int main(int argc, char**argv) {
                 }
         }
 
-        #pragma omp parallel for
+        #pragma omp parallel for num_threads(number_of_threads)
         for(int i=0; i<number_of_buckets; i++) {
+                
                 sort(buckets[i].begin(), buckets[i].end());
         }
 
@@ -93,7 +94,7 @@ int main(int argc, char**argv) {
 
         vector<int> result_vector(current_sum);
 
-        #pragma omp parallel for
+        #pragma omp parallel for num_threads(number_of_threads)
         for(int i=0; i<number_of_buckets; i++) {
                 int get_offset_start;
                 if (i==0) {
