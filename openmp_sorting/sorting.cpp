@@ -15,6 +15,8 @@ int main(int argc, char**argv) {
                 return -1;
         }
 
+        double start = omp_get_wtime();  
+
         int number_of_points = stoi(argv[1]);
         int number_of_buckets = stoi(argv[2]);
         int range_of_numbers = stoi(argv[3]);
@@ -117,6 +119,9 @@ int main(int argc, char**argv) {
                         cout << x << " ";
                 }
         }
+
+        double end = omp_get_wtime();  
+        cout << end-start << "," << number_of_points << "," << number_of_buckets << "," << range_of_numbers << "," << number_of_threads << endl;
         return 0;
 
 }
