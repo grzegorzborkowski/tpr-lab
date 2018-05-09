@@ -22,8 +22,7 @@ int main(int argc, char**argv) {
         int range_of_numbers = atoi(argv[3]);
         int number_of_threads = atoi(argv[4]);
 
-	// TODO: in case of problems with memory, declare this array differently
-        int elementTable[number_of_points];
+        int *elementTable = new int[number_of_points];
         
         vector<int>* buckets[number_of_buckets];
         for(int i=0; i<number_of_buckets; i++) {
@@ -125,7 +124,7 @@ int main(int argc, char**argv) {
 
         double end = omp_get_wtime();  
         cout << end-start << "," << number_of_points << "," << number_of_buckets << "," << range_of_numbers << "," << number_of_threads << endl;
-        
+       	delete [] elementTable; 
         return 0;
 
 }
