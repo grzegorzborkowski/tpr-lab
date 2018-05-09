@@ -3,7 +3,7 @@ printf "\n" >> results.txt
 
 make 
 
-for NUMBER_OF_POINTS in 1000000 5000000 10000000 50000000
+for NUMBER_OF_POINTS in 1000000 5000000 10000000 
 do
         for NUMBER_OF_BUCKETS in 100 1000 10000
         do

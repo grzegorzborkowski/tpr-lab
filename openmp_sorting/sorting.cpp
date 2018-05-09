@@ -34,7 +34,7 @@ int main(int argc, char**argv) {
                 omp_init_lock(&write_locks[i]);
         }
 
-        #pragma omp parallel  num_threads(number_of_threads)
+        #pragma omp parallel num_threads(number_of_threads)
         {
                 srand(int(time(NULL)) ^ omp_get_thread_num()); // https://www.viva64.com/en/b/0012/
                 #pragma omp for
@@ -124,7 +124,9 @@ int main(int argc, char**argv) {
 
         double end = omp_get_wtime();  
         cout << end-start << "," << number_of_points << "," << number_of_buckets << "," << range_of_numbers << "," << number_of_threads << endl;
-       	delete [] elementTable; 
+       	delete[] elementTable; 
+	delete[] buckets;
+	delete result_vector;
         return 0;
 
 }
