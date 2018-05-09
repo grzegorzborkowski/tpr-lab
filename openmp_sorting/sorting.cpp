@@ -5,7 +5,8 @@
 #include <vector>
 #include <omp.h>
 #include <algorithm>
-#define DEBUG false
+
+#define DEBUG true
 
 using namespace std;
 
@@ -41,11 +42,11 @@ int main(int argc, char**argv) {
                 }
         }
 
-        if (DEBUG) {
-                for(int i=0; i<number_of_points; i++) {
-                        cout << elementTable[i] << " ";
-                }
-        }
+        // if (DEBUG) {
+        //         for(int i=0; i<number_of_points; i++) {
+        //                 cout << elementTable[i] << " ";
+        //         }
+        // }
 
         #pragma omp parallel for num_threads(number_of_threads)
         for(int n=0; n<number_of_points; ++n) {
@@ -59,26 +60,26 @@ int main(int argc, char**argv) {
                 buckets[bucket_number].push_back(elementTable[n]);
                 omp_unset_lock(&write_locks[bucket_number]);
         }
-
+       
         for(int i=0; i<number_of_buckets; i++) {
                 omp_destroy_lock(&write_locks[i]);
         }
 
-        if (DEBUG) {
-                for(int i=0; i<number_of_buckets; i++) {
-                        for(int j=0; j<buckets[i].size(); j++) {
-                                cout << buckets[i][j] << " ";
-                        }
-                        cout << endl;
-                }
-        }
+        // if (DEBUG) {
+        //         for(int i=0; i<number_of_buckets; i++) {
+        //                 for(int j=0; j<buckets[i].size(); j++) {
+        //                         cout << buckets[i][j] << " ";
+        //                 }
+        //                 cout << endl;
+        //         }
+        // }
 
         #pragma omp parallel for num_threads(number_of_threads)
         for(int i=0; i<number_of_buckets; i++) {
                 
                 sort(buckets[i].begin(), buckets[i].end());
         }
-
+       
         vector<int> offset_vector;
         int current_sum = 0;
 
@@ -87,12 +88,11 @@ int main(int argc, char**argv) {
                 current_sum += bucket_size;
                 offset_vector.push_back(current_sum);
         }
-
-        if (DEBUG) {
-                for(int j=0; j<offset_vector.size(); j++) {
-                        cout << offset_vector[j] << " ";
-                }
-        }
+        // if (DEBUG) {
+        //         for(int j=0; j<offset_vector.size(); j++) {
+        //                 cout << offset_vector[j] << " ";
+        //         }
+        // }
 
         vector<int> result_vector(current_sum);
 
@@ -113,15 +113,16 @@ int main(int argc, char**argv) {
                         element_in_bucket_idx+=1;
                 }
         }
-
-        if (DEBUG) {
-                for(auto x : result_vector) {
-                        cout << x << " ";
-                }
-        }
+        
+        // if (DEBUG) {
+        //         for(auto x : result_vector) {
+        //                 cout << x << " ";
+        //         }
+        // }
 
         double end = omp_get_wtime();  
         cout << end-start << "," << number_of_points << "," << number_of_buckets << "," << range_of_numbers << "," << number_of_threads << endl;
+        
         return 0;
 
 }

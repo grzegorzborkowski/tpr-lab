@@ -3,7 +3,7 @@ printf "\n" >> results.txt
 
 make 
 
-for NUMBER_OF_POINTS in 10000 100000000 500000000
+for NUMBER_OF_POINTS in 100000 500000 1000000
 do
         for NUMBER_OF_BUCKETS in 100 1000 10000
         do
@@ -11,7 +11,7 @@ do
             do
                  for NUMBER_OF_THREADS in {1..8}
                     do
-                        ./sorting $NUMBER_OF_POINTS $NUMBER_OF_BUCKETS $RANGE_OF_NUMBERS $NUMBER_OF_THREADS >> "results.txt"
+                        ./sorting $NUMBER_OF_POINTS $NUMBER_OF_BUCKETS $RANGE_OF_NUMBERS $NUMBER_OF_THREADS >> results.txt
                     done
             done
         done
