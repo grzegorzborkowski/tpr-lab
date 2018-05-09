@@ -3,11 +3,11 @@ printf "\n" >> results.txt
 
 make 
 
-for NUMBER_OF_POINTS in 100000 500000 1000000
+for NUMBER_OF_POINTS in 1000000 5000000 10000000 50000000
 do
         for NUMBER_OF_BUCKETS in 100 1000 10000
         do
-            for RANGE_OF_NUMBERS in 1000 10000 100000 1000000 10000000
+            for RANGE_OF_NUMBERS in 1000 10000 100000
             do
                  for NUMBER_OF_THREADS in {1..8}
                     do

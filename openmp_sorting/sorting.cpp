@@ -9,7 +9,6 @@
 #define DEBUG true
 
 using namespace std;
-
 int main(int argc, char**argv) {
         if (argc != 5) {
                 cout << "Please provide arguments [number_of_points number_of_buckets range_of_numbers number_of_threads]" << endl;
@@ -18,14 +17,18 @@ int main(int argc, char**argv) {
 
         double start = omp_get_wtime();  
 
-        int number_of_points = stoi(argv[1]);
-        int number_of_buckets = stoi(argv[2]);
-        int range_of_numbers = stoi(argv[3]);
-        int number_of_threads = stoi(argv[4]);
+        int number_of_points = atoi(argv[1]);
+        int number_of_buckets = atoi(argv[2]);
+        int range_of_numbers = atoi(argv[3]);
+        int number_of_threads = atoi(argv[4]);
 
+	// TODO: in case of problems with memory, declare this array differently
         int elementTable[number_of_points];
         
-        vector<int> buckets[number_of_buckets];
+        vector<int>* buckets[number_of_buckets];
+        for(int i=0; i<number_of_buckets; i++) {
+                buckets[i] = new vector<int>();
+        }
         omp_lock_t write_locks[number_of_buckets];
 
         for(int i=0; i<number_of_buckets; i++) {
@@ -57,7 +60,7 @@ int main(int argc, char**argv) {
                 int bucket_number = elementTable[n]/divide;
                 bucket_number = min(bucket_number, number_of_buckets-1);
                 omp_set_lock(&write_locks[bucket_number]);
-                buckets[bucket_number].push_back(elementTable[n]);
+                buckets[bucket_number]->push_back(elementTable[n]);
                 omp_unset_lock(&write_locks[bucket_number]);
         }
        
@@ -77,14 +80,14 @@ int main(int argc, char**argv) {
         #pragma omp parallel for num_threads(number_of_threads)
         for(int i=0; i<number_of_buckets; i++) {
                 
-                sort(buckets[i].begin(), buckets[i].end());
+                sort(buckets[i]->begin(), buckets[i]->end());
         }
        
         vector<int> offset_vector;
         int current_sum = 0;
 
         for(int i=0; i<number_of_buckets; i++) {
-                int bucket_size = buckets[i].size();
+                int bucket_size = buckets[i]->size();
                 current_sum += bucket_size;
                 offset_vector.push_back(current_sum);
         }
@@ -94,7 +97,7 @@ int main(int argc, char**argv) {
         //         }
         // }
 
-        vector<int> result_vector(current_sum);
+        vector<int>* result_vector = new vector<int>(current_sum);
 
         #pragma omp parallel for num_threads(number_of_threads)
         for(int i=0; i<number_of_buckets; i++) {
@@ -109,7 +112,7 @@ int main(int argc, char**argv) {
                 int element_in_bucket_idx = 0;
 
                 for(int k=get_offset_start; k<get_offset_end; k++) {
-                        result_vector[k] = buckets[i][element_in_bucket_idx];
+                        result_vector->at(k) = buckets[i]->at(element_in_bucket_idx);
                         element_in_bucket_idx+=1;
                 }
         }
