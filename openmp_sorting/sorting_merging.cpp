@@ -116,9 +116,13 @@ int main(int argc, char**argv) {
                 }
         }
 
-        for(int i=0; i<result_vector->size(); i++) {
-            cout << -result_vector->at(i) << " "; 
-        }
+        // for(int i=0; i<result_vector->size(); i++) {
+        //     cout << -result_vector->at(i) << " "; 
+        // }
+
+
+        double end = omp_get_wtime();  
+        cout << end-start << "," << number_of_points << "," << number_of_buckets << "," << range_of_numbers << "," << number_of_threads << endl;
 
         delete [] elementTable;
         
