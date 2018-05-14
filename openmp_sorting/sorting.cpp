@@ -5,10 +5,13 @@
 #include <vector>
 #include <omp.h>
 #include <algorithm>
+#include <random>
 
 #define DEBUG true
+#define TIME_DEBUG true
 
 using namespace std;
+
 int main(int argc, char**argv) {
         if (argc != 6) {
                 cout << "Please provide arguments [number_of_points number_of_buckets range_of_numbers number_of_threads is_scalable]" << endl;
@@ -28,6 +31,13 @@ int main(int argc, char**argv) {
           number_of_points = number_of_points * number_of_threads;
         }
 
+        omp_set_num_threads(number_of_threads);
+
+        double counter_new;
+        double counter_old;
+
+        if(TIME_DEBUG) counter_old = omp_get_wtime();
+
         int *elementTable = new int[number_of_points];
 
         vector<int>* buckets[number_of_buckets];
@@ -40,23 +50,31 @@ int main(int argc, char**argv) {
                 omp_init_lock(&write_locks[i]);
         }
 
-        #pragma omp parallel num_threads(number_of_threads)
+        #pragma omp parallel
         {
-                srand(int(time(NULL)) ^ omp_get_thread_num()); // https://www.viva64.com/en/b/0012/
-                #pragma omp for
-                for(int n=0; n<number_of_points; ++n) {
-                        int rand_number = rand() % range_of_numbers;
-                        elementTable[n] = rand_number;
-                }
+          std::random_device rd;
+          std::mt19937 gen(rd());
+          std::uniform_int_distribution<> dis(0, range_of_numbers);
+
+          #pragma omp for
+          for(int n=0; n<number_of_points; ++n) {
+            elementTable[n] = dis(gen);
+          }
         }
 
-        // if (DEBUG) {
-        //         for(int i=0; i<number_of_points; i++) {
-        //                 cout << elementTable[i] << " ";
-        //         }
-        // }
+        if(TIME_DEBUG) {
+          counter_new = omp_get_wtime();
+          cout << "table generation: " << counter_new-counter_old << endl;
+          counter_old = omp_get_wtime();
+        }
 
-        #pragma omp parallel for num_threads(number_of_threads)
+ //       if (DEBUG) {
+ //               for(int i=0; i<number_of_points; i++) {
+ //                       cout << elementTable[i] << " ";
+ //               }
+ //       }
+
+        #pragma omp parallel for
         for(int n=0; n<number_of_points; ++n) {
                 int divide = range_of_numbers / number_of_buckets;
                 if (divide == 0) {
@@ -73,6 +91,12 @@ int main(int argc, char**argv) {
                 omp_destroy_lock(&write_locks[i]);
         }
 
+        if(TIME_DEBUG) {
+          counter_new = omp_get_wtime();
+          cout << "splitting to buckets: " << counter_new-counter_old << endl;
+          counter_old = omp_get_wtime();
+        }
+
         // if (DEBUG) {
         //         for(int i=0; i<number_of_buckets; i++) {
         //                 for(int j=0; j<buckets[i].size(); j++) {
@@ -82,10 +106,16 @@ int main(int argc, char**argv) {
         //         }
         // }
 
-        #pragma omp parallel for num_threads(number_of_threads)
+        #pragma omp parallel for
         for(int i=0; i<number_of_buckets; i++) {
 
                 sort(buckets[i]->begin(), buckets[i]->end());
+        }
+
+        if(TIME_DEBUG) {
+          counter_new = omp_get_wtime();
+          cout << "sorting buckets: " << counter_new-counter_old << endl;
+          counter_old = omp_get_wtime();
         }
 
         vector<int> offset_vector;
@@ -104,7 +134,7 @@ int main(int argc, char**argv) {
 
         vector<int>* result_vector = new vector<int>(current_sum);
 
-        #pragma omp parallel for num_threads(number_of_threads)
+        #pragma omp parallel for
         for(int i=0; i<number_of_buckets; i++) {
                 int get_offset_start;
                 if (i==0) {
@@ -120,6 +150,12 @@ int main(int argc, char**argv) {
                         result_vector->at(k) = buckets[i]->at(element_in_bucket_idx);
                         element_in_bucket_idx+=1;
                 }
+        }
+
+        if(TIME_DEBUG) {
+          counter_new = omp_get_wtime();
+          cout << "merging buckets: " << counter_new-counter_old << endl;
+          counter_old = omp_get_wtime();
         }
 
         // if (DEBUG) {
