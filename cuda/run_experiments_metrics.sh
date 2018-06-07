@@ -3,9 +3,9 @@
 nvcc FD_2D_global.cu -w -o global
 nvcc FD_2D_texture_pad.cu -w -o texture
 
-#printf "N,block,update_min_occupancy,update_max_occupancy,update_avg_occupancy,copy_min_occupancy,copy_max_occupancy_copy_avg_occupancy \n" >> metryki_global.txt
-#printf "N,block,update_min_occupancy,update_max_occupancy,update_avg_occupancy,copy_min_occupancy,copy_max_occupancy_copy_avg_occupancy \n" >> metryki_shared.txt
-#printf "N,block,update_min_occupancy,update_max_occupancy,update_avg_occupancy,copy_min_occupancy,copy_max_occupancy_copy_avg_occupancy \n" >> metryki_texture.txt
+#printf "N,block,update_min_occupancy,update_max_occupancy,update_avg_occupancy,copy_min_occupancy,copy_max_occupancy,copy_avg_occupancy \n" >> metryki_global.txt
+#printf "N,block,update_min_occupancy,update_max_occupancy,update_avg_occupancy,copy_min_occupancy,copy_max_occupancy,copy_avg_occupancy \n" >> metryki_shared.txt
+#printf "N,block,update_min_occupancy,update_max_occupancy,update_avg_occupancy,copy_min_occupancy,copy_max_occupancy,copy_avg_occupancy \n" >> metryki_texture.txt
 
 prof_and_transform() {
     printf "$2,$3," >> $4
@@ -14,7 +14,7 @@ prof_and_transform() {
     printf "\n" >> $4
 }
 
-for N in {1056..2048..32};
+for N in {2080..4096..32};
 do
     for BLOCK in 8 16 24 32
     do
